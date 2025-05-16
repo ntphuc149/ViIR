@@ -1,0 +1,12 @@
+# Configuration for Baseline (No fine-tuning)
+
+# Inherit from default configuration
+inherit: "viir/config/default.yaml"
+
+# Specific configuration for baseline strategy
+strategy: "baseline"
+
+# Training configuration
+training:
+  epochs: 0 # No training for baseline
+  train_samples: 0 # No training samples needed

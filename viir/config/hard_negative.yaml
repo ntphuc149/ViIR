@@ -1,0 +1,24 @@
+# Configuration for Hard Negative fine-tuning
+
+# Inherit from default configuration
+inherit: "config/default.yaml"
+
+# Specific configuration for hard negative strategy
+strategy: "hard_negative"
+
+# Training configuration
+training:
+  epochs: 3
+  loss: "MultipleNegativesRankingLoss"
+  batch_size: 16
+  warmup_ratio: 0.1
+
+# Data configuration for hard negatives
+data:
+  hard_negatives_per_query: 3 # Number of hard negatives per query
+  random_negatives_per_query: 2 # Additional random negatives per query
+
+# Hard negative mining configuration
+hard_negative_mining:
+  initial_model: "FacebookAI/xlm-roberta-base" # Model to use for initial mining
+  mining_batch_size: 32

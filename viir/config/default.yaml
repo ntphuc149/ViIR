@@ -1,0 +1,37 @@
+# Default configuration for ViIR
+
+# Data configuration
+data:
+  output_dir: "data/processed"
+  train_ratio: 0.8
+  dev_ratio: 0.1
+  test_ratio: 0.1
+  seed: 42
+
+# Model configuration
+model:
+  name: "FacebookAI/xlm-roberta-base"
+  max_seq_length: 512
+  trust_remote_code: true
+
+# Training configuration
+training:
+  batch_size: 16
+  epochs: 3
+  warmup_steps: 100
+  evaluation_steps: 1000
+  learning_rate: 1e-5
+  output_dir: "output/model"
+  device: "cuda" # or "cpu"
+
+# Evaluation configuration
+evaluation:
+  batch_size: 32
+  metrics: ["accuracy", "precision", "recall", "ndcg", "mrr"]
+  output_dir: "output/evaluation"
+
+# Logging configuration
+logging:
+  level: "INFO"
+  file: "logs/viir.log"
+  console: true
