@@ -39,7 +39,6 @@ pip install -e .
 ### 1. Data Preprocessing
 
 The framework expects your dataset to have at least the following columns:
-
 - `question` or `query`: The search query text
 - `context` or `document`: The document text
 - (Optional) `abstractive_answer`: The ground truth answer
@@ -63,10 +62,15 @@ python scripts/train.py --config config/positive_pair.yaml
 python scripts/train.py --config config/hard_negative.yaml
 ```
 
-You can customize hyperparameters by editing the YAML files or by providing command-line overrides:
+You can directly specify model, batch size, learning rate and other parameters via command line:
 
 ```bash
-python scripts/train.py --config config/hard_negative.yaml --data_dir path/to/data --output_dir path/to/output
+# Using PhoBERT model with custom hyperparameters
+python scripts/train.py --config config/hard_negative.yaml \
+                        --model_name vinai/phobert-base \
+                        --batch_size 32 \
+                        --learning_rate 2e-5 \
+                        --epochs 5
 ```
 
 ### 3. Model Evaluation
@@ -91,11 +95,24 @@ For convenience, you can run the entire pipeline in one command:
 python main.py --input /path/to/your_dataset.csv --strategy hard_negative
 ```
 
-Switch between strategies:
+Switch between strategies and models:
 
 ```bash
+# Using baseline strategy with default XLM-RoBERTa
 python main.py --input /path/to/your_dataset.csv --strategy baseline
-python main.py --input /path/to/your_dataset.csv --strategy positive_pair
+
+# Using positive-pair strategy with PhoBERT
+python main.py --input /path/to/your_dataset.csv \
+               --strategy positive_pair \
+               --model_name vinai/phobert-base
+
+# Using hard negative strategy with custom hyperparameters
+python main.py --input /path/to/your_dataset.csv \
+               --strategy hard_negative \
+               --model_name vinai/phobert-base-v2 \
+               --batch_size 16 \
+               --learning_rate 3e-5 \
+               --epochs 3
 ```
 
 ## Project Structure
@@ -116,14 +133,29 @@ ViIR/
 
 ### Using Different Models
 
-You can use any model from the Hugging Face hub by changing the `model.name` parameter in the configuration files:
+You can use any model from the Hugging Face hub either by specifying it in the command line or by changing the `model.name` parameter in the configuration files:
 
+#### Command line method:
+```bash
+python main.py --input your_data.csv --strategy hard_negative --model_name vinai/phobert-base
+```
+
+#### Configuration file method:
 ```yaml
 model:
-  name: "vinai/phobert-base" # Or any other Vietnamese language model
-  max_seq_length: 256
+  name: "vinai/phobert-base"  # Or any other Vietnamese language model
+  max_seq_length: 512
   trust_remote_code: true
 ```
+
+### Supported Vietnamese Models
+
+The framework has been tested with the following Vietnamese models:
+- `FacebookAI/xlm-roberta-base` (default)
+- `FacebookAI/xlm-roberta-large` 
+- `vinai/phobert-base-v2`
+- `vinai/phobert-large`
+- And other models compatible with Sentence Transformers
 
 ### Custom Dataset Format
 
@@ -136,7 +168,7 @@ If you use this framework in your research or applications, please cite:
 ```
 @misc{viir,
   author = {Truong-Phuc Nguyen},
-  title = {ViIR: The unified framework for fine-tuning Vietnamese Information Retrieval models with various tuning strategies},
+  title = {ViIR: The Unified Framework for Fine-tuning Vietnamese Information Retrieval Models with Various Tuning Strategies},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
