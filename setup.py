@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="viir",
     version="0.1.0",
-    description="ViIR: The unified framework for fine-tuning Vietnamese Information Retrieval models with various tuning strategies",
+    description="ViIR: The Unified Framework for Fine-tuning Vietnamese Information Retrieval Models with Various Tuning Strategies.",
     author="Truong-Phuc Nguyen",
     author_email="nguyentruongphuc_12421TN@utehy.edu.vn",
     url="https://github.com/ntphuc149/ViIR",
