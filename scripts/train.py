@@ -30,6 +30,18 @@ def parse_args():
     parser.add_argument("--output_dir", "-o", type=str, default=None,
                         help="Output directory for model and results")
     
+    parser.add_argument("--model_name", "-m", type=str, default=None,
+                        help="Model name/path (e.g., 'FacebookAI/xlm-roberta-base', 'vinai/phobert-base')")
+    
+    parser.add_argument("--batch_size", "-b", type=int, default=None,
+                        help="Training batch size")
+    
+    parser.add_argument("--learning_rate", "-lr", type=float, default=None,
+                        help="Learning rate")
+    
+    parser.add_argument("--epochs", "-e", type=int, default=None,
+                        help="Number of training epochs")
+    
     parser.add_argument("--log", "-l", type=str, default="info",
                         choices=["debug", "info", "warning", "error", "critical"],
                         help="Logging level")
@@ -60,6 +72,26 @@ def main():
         config["training"]["output_dir"] = args.output_dir
         config["evaluation"]["output_dir"] = os.path.join(args.output_dir, "evaluation")
         logger.info(f"Output directory set to {args.output_dir}")
+    
+    # Override model name if specified
+    if args.model_name:
+        config["model"]["name"] = args.model_name
+        logger.info(f"Model name set to {args.model_name}")
+    
+    # Override batch size if specified
+    if args.batch_size:
+        config["training"]["batch_size"] = args.batch_size
+        logger.info(f"Batch size set to {args.batch_size}")
+    
+    # Override learning rate if specified
+    if args.learning_rate:
+        config["training"]["learning_rate"] = args.learning_rate
+        logger.info(f"Learning rate set to {args.learning_rate}")
+    
+    # Override epochs if specified
+    if args.epochs:
+        config["training"]["epochs"] = args.epochs
+        logger.info(f"Epochs set to {args.epochs}")
     
     # Create output directories
     os.makedirs(config["training"]["output_dir"], exist_ok=True)
