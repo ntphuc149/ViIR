@@ -1,7 +1,7 @@
 # Configuration for Hard Negative fine-tuning
 
 # Inherit from default configuration
-inherit: "config/default.yaml"
+inherit: "viir/config/default.yaml"
 
 # Specific configuration for hard negative strategy
 strategy: "hard_negative"
