@@ -8,10 +8,12 @@ import os
 import sys
 from typing import Dict, Any
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import yaml
 
 from viir.data.processor import load_processed_data
-from viir.evaluation.evaluator import evaluate_model
+from viir.evaluation.evaluator import evaluate_model, IRModelEvaluator
 from viir.utils.logger import setup_logging
 from viir.utils.config import load_config
 
@@ -26,7 +28,7 @@ def parse_args():
     parser.add_argument("--data_dir", "-d", type=str, required=True,
                         help="Directory containing processed data")
     
-    parser.add_argument("--config", "-c", type=str, default="config/default.yaml",
+    parser.add_argument("--config", "-c", type=str, default="viir/config/default.yaml",
                         help="Path to configuration file")
     
     parser.add_argument("--output_dir", "-o", type=str, default=None,
@@ -54,7 +56,12 @@ def main():
     
     # Load configuration
     logger.info(f"Loading configuration from {args.config}")
-    config = load_config(args.config)
+    try:
+        config = load_config(args.config)
+        logger.info("Configuration loaded successfully")
+    except FileNotFoundError as e:
+        logger.error(f"Error loading configuration: {e}")
+        sys.exit(1)
     
     # Override output directory if specified
     if args.output_dir:
@@ -84,7 +91,6 @@ def main():
     else:
         # Evaluate on specified split
         from sentence_transformers import SentenceTransformer
-        from viir.evaluation.evaluator import IRModelEvaluator
         
         model = SentenceTransformer(args.model_path)
         evaluator = IRModelEvaluator(model, data, config)
