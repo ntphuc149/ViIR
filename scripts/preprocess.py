@@ -8,10 +8,11 @@ import os
 import sys
 from typing import Dict, Any
 
-import yaml
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from viir.data.processor import DataProcessor
 from viir.utils.logger import setup_logging
+from viir.utils.config import load_config
 
 
 def parse_args():
@@ -24,7 +25,7 @@ def parse_args():
     parser.add_argument("--output", "-o", type=str, default="data/processed",
                         help="Output directory for processed data")
     
-    parser.add_argument("--config", "-c", type=str, default="config/default.yaml",
+    parser.add_argument("--config", "-c", type=str, default="viir/config/default.yaml",
                         help="Path to configuration file")
     
     parser.add_argument("--log", "-l", type=str, default="info",
@@ -32,14 +33,6 @@ def parse_args():
                         help="Logging level")
     
     return parser.parse_args()
-
-
-def load_config(config_path: str) -> Dict[str, Any]:
-    """Load configuration from YAML file."""
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-    
-    return config
 
 
 def main():
@@ -53,7 +46,12 @@ def main():
     
     # Load configuration
     logger.info(f"Loading configuration from {args.config}")
-    config = load_config(args.config)
+    try:
+        config = load_config(args.config)
+        logger.info("Configuration loaded successfully")
+    except FileNotFoundError as e:
+        logger.error(f"Error loading configuration: {e}")
+        sys.exit(1)
     
     # Override output directory if specified
     if args.output:
