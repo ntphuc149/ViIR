@@ -1,24 +1,14 @@
-# Configuration for Hard Negative fine-tuning
+# Configuration for Positive Pair fine-tuning
 
 # Inherit from default configuration
 inherit: "viir/config/default.yaml"
 
-# Specific configuration for hard negative strategy
-strategy: "hard_negative"
+# Specific configuration for positive pair strategy
+strategy: "positive_pair"
 
 # Training configuration
 training:
   epochs: 3
-  loss: "MultipleNegativesRankingLoss"
+  loss: "CosineSimilarityLoss"
   batch_size: 16
   warmup_ratio: 0.1
-
-# Data configuration for hard negatives
-data:
-  hard_negatives_per_query: 3 # Number of hard negatives per query
-  random_negatives_per_query: 2 # Additional random negatives per query
-
-# Hard negative mining configuration
-hard_negative_mining:
-  initial_model: "FacebookAI/xlm-roberta-base" # Model to use for initial mining
-  mining_batch_size: 32
