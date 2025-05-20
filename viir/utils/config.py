@@ -3,9 +3,36 @@ Configuration utilities.
 """
 
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import yaml
+
+
+def find_config_file(config_path: str) -> str:
+    """
+    Find the config file by searching in multiple locations.
+    
+    Args:
+        config_path: Base path to the YAML configuration file
+        
+    Returns:
+        Resolved path to the configuration file
+    
+    Raises:
+        FileNotFoundError: If the configuration file cannot be found
+    """
+    search_paths = [
+        config_path,                            # Direct path
+        os.path.join("viir", config_path),      # Inside viir directory
+        os.path.join("viir", "config", os.path.basename(config_path))  # Inside viir/config
+    ]
+    
+    for path in search_paths:
+        if os.path.exists(path):
+            return path
+    
+    # If we reach here, the file was not found
+    raise FileNotFoundError(f"Config file not found: {config_path}. Searched in: {search_paths}")
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
@@ -18,7 +45,9 @@ def load_config(config_path: str) -> Dict[str, Any]:
     Returns:
         Configuration dictionary
     """
-    with open(config_path, "r", encoding="utf-8") as f:
+    resolved_path = find_config_file(config_path)
+    
+    with open(resolved_path, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     
     # Process inheritance
@@ -26,14 +55,19 @@ def load_config(config_path: str) -> Dict[str, Any]:
         parent_path = config.pop("inherit")
         if not os.path.isabs(parent_path):
             # Make parent path relative to current config file
-            config_dir = os.path.dirname(config_path)
-            parent_path = os.path.join(config_dir, parent_path)
+            config_dir = os.path.dirname(resolved_path)
+            parent_path = os.path.join(config_dir, os.path.basename(parent_path))
         
-        parent_config = load_config(parent_path)
-        
-        # Merge configs: parent values are overridden by child values
-        merged_config = _deep_merge(parent_config, config)
-        return merged_config
+        try:
+            parent_config = load_config(parent_path)
+            
+            # Merge configs: parent values are overridden by child values
+            merged_config = _deep_merge(parent_config, config)
+            return merged_config
+        except FileNotFoundError:
+            # If parent config not found, just use current config
+            print(f"Warning: Parent config {parent_path} not found, using only child config")
+            return config
     
     return config
 
