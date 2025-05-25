@@ -103,8 +103,8 @@ class PositivePairDataset(IRDatasetBase):
             
             for doc_id in positive_ids:
                 doc_text = self.corpus_dict[doc_id]
-                # Create a positive pair example
-                train_examples.append(InputExample(texts=[query_text, doc_text]))
+                # Thêm label=1.0 vào InputExample
+                train_examples.append(InputExample(texts=[query_text, doc_text], label=1.0))
         
         logger.info(f"Created {len(train_examples)} positive pair examples")
         return train_examples
