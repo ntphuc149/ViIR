@@ -33,6 +33,11 @@ class PositivePairTrainer(BaseTrainer):
             logger.warning("No training examples found, skipping training")
             return self.model
         
+        # Log ví dụ đầu tiên để debug
+        if len(train_examples) > 0:
+            logger.info(f"Example training data - texts: {train_examples[0].texts}")
+            logger.info(f"Example training data - label: {train_examples[0].label}")
+        
         # Create data loader
         train_dataloader = DataLoader(
             train_examples, 
@@ -50,7 +55,12 @@ class PositivePairTrainer(BaseTrainer):
         # Training parameters
         num_epochs = self.config["training"]["epochs"]
         evaluation_steps = self.config["training"]["evaluation_steps"]
-        warmup_steps = self.config["training"]["warmup_steps"]
+        warmup_steps = self.config["training"].get("warmup_steps", 100)
+        if "warmup_ratio" in self.config["training"] and len(train_examples) > 0:
+            warmup_steps = int(len(train_examples) / self.config["training"]["batch_size"] * 
+                              self.config["training"]["warmup_ratio"])
+            logger.info(f"Setting warmup steps to {warmup_steps} based on warmup ratio")
+        
         lr = self.config["training"]["learning_rate"]
         
         # Train the model
